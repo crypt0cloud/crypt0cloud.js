@@ -1,12 +1,7 @@
 var rp = require('request-promise');
 var nacl = require('tweetnacl');
 nacl.util = require('tweetnacl-util');
-
 var sha256 = require("js-sha256").sha256;
-
-exports.printMsg = function() {
-    console.log("This is a message from the demo package");
-}
 
 class CryptoCloud{
     constructor(endpoint){
@@ -37,6 +32,84 @@ class CryptoCloud{
         await this.client.PostSingleTransaction(t,kp);
 
         return kp;
+    }
+
+    async InsertTransaction(payload, userkp, appid){
+        let b1 = await this.client.getCurrentBlock();
+        let nid = await this.client.getNodeId();
+
+        let t = {
+            AppID: this.cry.Base64Encode(appid),
+            Signer: this.cry.Base64Encode(userkp.publicKey),
+            Payload: payload,
+            SignKind: "",
+            SignerKinds: [],
+
+            FromNode: nid,
+            ToNode: nid,
+
+            Callback: "demo",
+            Creation: this.cry.CurrentMilis(),
+            BlockSign: b1.Sign,
+        };
+
+        await this.client.PostSingleTransaction(t,userkp);
+
+        return t;
+    }
+
+    async CreateGroup(payload, kinds, appkeys, callback){
+        let nid = await this.client.getNodeId();
+
+        let t = {
+            AppID: this.cry.Base64Encode(appkeys.publicKey),
+            Payload: payload,
+            SignKind: "__NEWCONTRACT",
+            SignerKinds: kinds,
+
+            FromNode: nid,
+            ToNode: nid,
+
+            Callback: callback,
+            Creation: this.cry.CurrentMilis(),
+        };
+        t.Signer = t.AppID
+
+        await this.client.CreateGroup(t,appkeys);
+
+        return t;
+    }
+
+    async CreateSigningRequest(payload, signkind, kinds, parent, apppublickey, callback){
+        let nid = await this.client.getNodeId();
+
+        let t = {
+            Payload: payload,
+            SignKind: signkind,
+            SignerKinds: kinds,
+            Parent: parent,
+            AppID: this.cry.Base64Encode(apppublickey),
+            Callback: callback,
+            FromNode: nid,
+        };
+
+        let ret = await this.client.CreateSigningRequest(t);
+
+        return ret;
+    }
+
+    async GetSigningRequest(idval){
+        return await this.client.GetSigningRequest(idval);
+    }
+
+    async SignSigningRequest(t, userkp){
+        let b1 = await this.client.getCurrentBlock();
+
+        t.Signer = this.cry.Base64Encode(userkp.publicKey);
+        t.ToNode = t.FromNode;
+        t.BlockSign = b1.Sign;
+
+        return await this.client.SignSigningRequest(t,userkp);
     }
 }
 
@@ -94,10 +167,7 @@ class Client{
                 },
             };
 
-            console.log(options);
-
             rp(options).then(obj => {
-                console.log(obj);
                 resolve(obj);
             })
         });
@@ -137,7 +207,8 @@ class Client{
     GetSigningRequest(transactionrequest){
         return new Promise(resolve => {
             let urlstring = "https://" + this._endpoint + "/api/v1/get_signingRequest?id=".concat(transactionrequest.toString());
-            rp(urlstring).then(obj => {
+            rp(urlstring).then(htmlstring => {
+                let obj = JSON.parse(htmlstring);
                 resolve(obj);
             })
         });
@@ -187,5 +258,6 @@ class Crypto{
     }
 }
 
+exports.Crypto = Crypto;
 exports.Client = Client;
 exports.Cloud = CryptoCloud;
