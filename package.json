@@ -1,6 +1,6 @@
 {
   "name": "crypt0cloud.js",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -16,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/crypt0cloud/crypt0cloud.js/issues"
   },
-  "homepage": "https://github.com/crypt0cloud/crypt0cloud.js#readme"
+  "homepage": "https://github.com/crypt0cloud/crypt0cloud.js#readme",
+  "dependencies": {
+    "ed25519": "0.0.4",
+    "request": "^2.88.0",
+    "request-promise": "4.2.4"
+  }
 }
