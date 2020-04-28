@@ -1,10 +1,6 @@
 {
   "name": "crypt0cloud.js",
-<<<<<<< HEAD
-  "version": "1.0.5",
-=======
-  "version": "1.1.0",
->>>>>>> refs/remotes/origin/master
+  "version": "1.1.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -22,13 +18,9 @@
   },
   "homepage": "https://github.com/crypt0cloud/crypt0cloud.js#readme",
   "dependencies": {
-<<<<<<< HEAD
-    "ed25519": "0.0.4",
-=======
     "tweetnacl": "1.0.1",
     "tweetnacl-util": "0.15.0",
     "js-sha256": "0.9.0",
->>>>>>> refs/remotes/origin/master
     "request": "^2.88.0",
     "request-promise": "4.2.4"
   }
